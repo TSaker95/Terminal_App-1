@@ -1,0 +1,1 @@
+[["Drake", "Ed Sheeran", "Taylor Swift", "Adele"], ["Brazil", "Thailand", "Saudi Arabia", "America"], ["J Balvin and Willy William", "Luis Fonsi and Daddy Yankee", "Shakira", "Camila Cabello"], ["China", "Japan", "Netherlands", "Germany"], ["Tim", "Tam", "Tums", "Tom"]]

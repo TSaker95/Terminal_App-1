@@ -18,6 +18,7 @@ def calculate(num1, op, num2)
   break if answer == "quit"
   if answer.to_i == correctanswer
     puts "Correct!"
+    
   else
     puts "Wrong!"
   end
