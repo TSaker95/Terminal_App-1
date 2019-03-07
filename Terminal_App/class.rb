@@ -5,34 +5,42 @@ class Questions
         @points = 0
         @questions_answered = [0,0,0,0]
         @topic_complete = "You've already completed this topic, choose another one.".colorize(:cyan)
-        # @progressbar = ProgressBar.create(:title => "Time Remaining", :starting_at => 0, :total => 60, :length => 60)
     end
-    def select_topic
+    def select_topic #method controlling the topic selection screen
         until @questions_answered == [5,5,5,5]            
-            @question_number = 0
+            @question_number = 0            
             topics_table = Terminal::Table.new :title => "Select a topic:", :style => { :width => 40, :border_x => "=".colorize(:yellow).on_blue, :border_i => "*".colorize(:yellow).on_blue, :alignment => :center} do |t|
-            t << ["History" , "Geography"]
+            t << ["History".colorize(:light_red) , "Geography".colorize(:light_green)]
             t << :separator
-            t << ["Math" , "Popular"]
-            end
-            puts topics_table
+            t << ["Math".colorize(:light_blue) , "Popular".colorize(:yellow)]
+            end #table contains topics to choose from
+            puts topics_table 
             puts "Please select a topic or type 'exit' to quit"
             @topic = gets.chomp.downcase
-            case @topic
+            @topic_colour =""
+            case @topic #case to run method and change colour of variable depending on topic selected
                 when "math"
-                    math
+                    @topic_colour = @topic.capitalize.colorize(:light_blue)
+                    math   
+                when "history"
+                    @topic_colour = @topic.capitalize.colorize(:light_red)
+                    random_question_generator
+                when "geography"
+                    @topic_colour = @topic.capitalize.colorize(:light_green)
+                    random_question_generator
+                when "popular"
+                    @topic_colour = @topic.capitalize.colorize(:yellow)
+                    random_question_generator
                 when "exit"
                     system("clear")
                     exit true
-                when "history", "geography", "popular"
-                    random_question_generator
                 else
                     system("clear")
                     puts "Invalid selection"
-            end
+            end            
         end
     end
-    def random_question_generator
+    def random_question_generator #method controls the non-math topics
         system("clear")
         @chosen_number= []
         case
@@ -47,10 +55,11 @@ class Questions
             puts @topic_complete
             sleep(1)
         else
+            #this section controls random selection of questions and matching answer from file
             @questions = JSON.parse(File.read("#{@topic}_questions.txt"))
             @answers = JSON.parse(File.read("#{@topic}_answers.txt"))
             @correct_answer = JSON.parse(File.read("#{@topic}_correct.txt"))
-            until @question_number == 5
+            until @question_number == 5 
                 finished = false
                 @random_number = rand(5)
                 if @chosen_number.include? @random_number
@@ -61,19 +70,16 @@ class Questions
                 @question = @questions[@chosen_number.last]
                 @answer = @answers[@chosen_number.last]
                 @correct = @correct_answer[@chosen_number.last]                
-                answer_table = Terminal::Table.new :title => "Topic: #{@topic.capitalize.light_blue}   Score: #{@points.to_s.colorize(:green)}\n#{@question}", :style => { :border_x => "=".colorize(:yellow).on_blue, :border_i => "*".colorize(:yellow).on_blue, :alignment => :center}  do |t|
-                        t << ["A: #{@answer[0]}".colorize(:light_magenta), "B: #{@answer[1]}".colorize(:light_magenta)]
+                answer_table = Terminal::Table.new :title => "Topic: #{@topic_colour}   Score: #{@points.to_s.colorize(:light_green)}\n#{@question}", :style => { :border_x => "=".colorize(:yellow).on_blue, :border_i => "*".colorize(:yellow).on_blue, :alignment => :center}  do |t|
+                        t << ["A: #{@answer[0]}", "B: #{@answer[1]}"]
                         t << :separator
-                        t << ["C: #{@answer[2]}".colorize(:light_magenta), "D: #{@answer[3]}".colorize(:light_magenta)]
+                        t << ["C: #{@answer[2]}", "D: #{@answer[3]}"]
                 end
                 until finished == true
                     system("clear")
-                    # 60.times { @progressbar.increment; sleep 0.05  }
                     puts answer_table
                     input = STDIN.getch.downcase
-                    # if @progressbar.finished? == false 
                         if input.match? /\A[a-d]/
-                            # @progressbar.stop
                             system("clear")
                             if input == @correct.downcase
                                 puts "#{input.chomp.upcase} is correct! You now have #{@points += 10} points!".colorize(:green) 
@@ -94,7 +100,6 @@ class Questions
                                     @questions_answered.insert(3, @question_number)
                             end
                                 finished = true
-                                # @progressbar.reset
                         else
                             system("clear")
                             puts "Invalid answer - Please choose A, B, C, or D".colorize(:red)
@@ -103,12 +108,6 @@ class Questions
                         if @question_number == 5 
                             finished = true 
                         end
-                    # else
-                    #     @progressbar.reset
-                    #     puts "You ran out of time - press any key to continue to the next question"
-                    #     anykey = STDIN.getch.downcase
-                    #     finished = true
-                    # end
                 end
             end
         end
@@ -142,7 +141,7 @@ class Questions
                         when 3 
                             math_array.insert(4, "D") 
                     end                    
-                math_table = Terminal::Table.new :title => "Topic: #{@topic.capitalize.light_blue}   Score: #{@points.to_s.colorize(:green)}\nWhat is #{num1} #{syms} #{num2}", :style => {:width => 40, :border_x => "=".colorize(:yellow).on_blue, :border_i => "*".colorize(:yellow).on_blue, :alignment => :center} do |t|
+                math_table = Terminal::Table.new :title => "Topic: #{@topic_colour}   Score: #{@points.to_s.colorize(:light_green)}\nWhat is #{num1} #{syms} #{num2}", :style => {:width => 40, :border_x => "=".colorize(:yellow).on_blue, :border_i => "*".colorize(:yellow).on_blue, :alignment => :center} do |t|
                     t << ["A: #{math_array[0]}" , "B: #{math_array[1]}"]
                     t << :separator
                     t << ["C: #{math_array[2]}" , "D: #{math_array[3]}"]
